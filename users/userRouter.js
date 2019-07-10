@@ -1,6 +1,4 @@
-const express = 'express';
-
-const router = express.Router();
+const router = requires('express').Router();
 
 router.post('/', (req, res) => {
 
