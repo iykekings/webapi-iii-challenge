@@ -17,16 +17,27 @@ router.post('/', validateUser, (req, res) => {
 router.post('/:id/posts', (req, res) => {});
 
 router.get('/', (req, res) => {
-  User.get()
-  .then(data => {
-    res.status(200).json(data)
-  })
-  .catch(error => {
-    res.status(500).json({message: 'Unable to retrieve users.'})
-  })
+	User.get()
+		.then(data => {
+			res.status(200).json(data);
+		})
+		.catch(error => {
+			res.status(500).json({ message: 'Unable to retrieve users.' });
+		});
 });
 
-router.get('/:id', (req, res) => {});
+router.get('/:id', validateUserId, async (req, res) => {
+	const id = req.params.id;
+	User.getById(id)
+		.then(data => {
+			res.status(200).json(data);
+		})
+		.catch(error => {
+			res
+				.status(500)
+				.json({ message: `Unable to retrieve user with id ${id}` });
+		});
+});
 
 router.get('/:id/posts', (req, res) => {});
 
@@ -37,20 +48,15 @@ router.put('/:id', (req, res) => {});
 //custom middleware
 
 async function validateUserId(req, res, next) {
-	const { id } = req.params.id;
-	if (isNaN(parseInt(id))) {
-		res.status(400).json({
-			message: 'The ID must be a number. Please check the ID and try again.'
-		});
-	} else {
-		const user = await user.getByID(id);
+	const id = req.params.id;
 
-		if (user) {
-			req.user = user;
-			next();
-		} else {
-			res.status(400).json({ message: 'Invalid user ID' });
-		}
+	const user = await User.getById(id);
+
+	if (user) {
+		req.user = user;
+		next();
+	} else {
+		res.status(400).json({ message: 'Invalid user ID' });
 	}
 }
 
