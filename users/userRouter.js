@@ -39,7 +39,16 @@ router.get('/:id', validateUserId, async (req, res) => {
 		});
 });
 
-router.get('/:id/posts', (req, res) => {});
+router.get('/:id/posts', (req, res) => {
+  const id = req.params.id;
+  User.getUserPosts(id)
+  .then(data => {
+    res.status(200).json(data);
+  })
+  .catch(error => {
+    res.status(500).json({message: "Unable to retrieve posts for this user."})
+  })
+});
 
 router.delete('/:id', (req, res) => {});
 
