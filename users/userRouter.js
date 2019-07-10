@@ -1,11 +1,11 @@
 const router = require('express').Router();
 const User = require('./userDb.js');
 
-router.post('/', validateUser, (req, res) => {
-	const { name } = req.body;
+router.post('/', validateUser, async (req, res) => {
+	const name = req.body;
 	User.insert(name)
 		.then(data => {
-			User.getByID(data.id).then(data => {
+			User.getById(data.id).then(data => {
 				res.status(201).json(data);
 			});
 		})
@@ -14,7 +14,20 @@ router.post('/', validateUser, (req, res) => {
 		});
 });
 
-router.post('/:id/posts', validatePost, (req, res) => {});
+router.post('/:id/posts', validateUserId, validatePost, async (req, res) => {
+	const id = req.params.id;
+	const textData = req.body;
+	const postData = { text: textData, user_id: id };
+	User.insert(postData)
+		.then(data => {
+			User.getUserPosts(id).then(data => {
+				res.status(201).json(data);
+			});
+		})
+		.catch(error => {
+			res.status(500).json({ message: 'Unable to add post.' });
+		});
+});
 
 router.get('/', (req, res) => {
 	User.get()
