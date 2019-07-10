@@ -39,18 +39,36 @@ router.get('/:id', validateUserId, async (req, res) => {
 		});
 });
 
-router.get('/:id/posts', (req, res) => {
-  const id = req.params.id;
-  User.getUserPosts(id)
-  .then(data => {
-    res.status(200).json(data);
-  })
-  .catch(error => {
-    res.status(500).json({message: "Unable to retrieve posts for this user."})
-  })
+router.get('/:id/posts', validateUserId, async (req, res) => {
+	const id = req.params.id;
+	User.getUserPosts(id)
+		.then(data => {
+			res.status(200).json(data);
+		})
+		.catch(error => {
+			res
+				.status(500)
+				.json({ message: 'Unable to retrieve posts for this user.' });
+		});
 });
 
-router.delete('/:id', (req, res) => {});
+router.delete('/:id', validateUserId, async (req, res) => {
+	const id = req.params.id;
+
+	User.remove(id)
+		.then(data => {
+			res
+				.status(200)
+				.json({
+					message: `User with id of ${id} has been successfully deleted!`
+				});
+		})
+		.catch(error => {
+			res.status(500).json({
+				message: "Unable to delete the user."
+			});
+		});
+});
 
 router.put('/:id', (req, res) => {});
 
@@ -70,8 +88,8 @@ async function validateUserId(req, res, next) {
 }
 
 function validateUser(req, res, next) {
-	if (!req.body) {
-		res.status(400).json({ message: 'Invalid user ID' });
+	if (!Object.keys(req.body)) {
+		res.status(400).json({ message: 'Missing user data' });
 	} else if (req.body.name) {
 		next();
 	} else {
