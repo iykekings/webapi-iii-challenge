@@ -14,7 +14,7 @@ router.post('/', validateUser, (req, res) => {
 		});
 });
 
-router.post('/:id/posts', (req, res) => {});
+router.post('/:id/posts', validatePost, (req, res) => {});
 
 router.get('/', (req, res) => {
 	User.get()
@@ -57,20 +57,31 @@ router.delete('/:id', validateUserId, async (req, res) => {
 
 	User.remove(id)
 		.then(data => {
-			res
-				.status(200)
-				.json({
-					message: `User with id of ${id} has been successfully deleted!`
-				});
+			res.status(200).json({
+				message: `User with id of ${id} has been successfully deleted!`
+			});
 		})
 		.catch(error => {
 			res.status(500).json({
-				message: "Unable to delete the user."
+				message: 'Unable to delete the user.'
 			});
 		});
 });
 
-router.put('/:id', (req, res) => {});
+router.put('/:id', validateUserId, validateUser, async (req, res) => {
+	const id = req.params.id;
+	const name = req.body;
+
+	User.update(id, name)
+		.then(data => {
+			User.getById(id).then(data => {
+				res.status(201).json(data);
+			});
+		})
+		.catch(error => {
+			res.status(500).json({ message: 'Unable to update user.' });
+		});
+});
 
 //custom middleware
 
@@ -88,7 +99,7 @@ async function validateUserId(req, res, next) {
 }
 
 function validateUser(req, res, next) {
-	if (!Object.keys(req.body)) {
+	if (Object.keys(req.body) == 0) {
 		res.status(400).json({ message: 'Missing user data' });
 	} else if (req.body.name) {
 		next();
@@ -98,7 +109,7 @@ function validateUser(req, res, next) {
 }
 
 function validatePost(req, res, next) {
-	if (!req.body) {
+	if (Object.keys(req.body) == 0) {
 		res.status(400).json({ message: 'Missing post data' });
 	} else if (req.body.text) {
 		next();
