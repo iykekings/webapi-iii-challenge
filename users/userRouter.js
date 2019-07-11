@@ -1,4 +1,6 @@
 const router = require('express').Router();
+const User = require('./userDb.js');
+const Post = require('../posts/postDb');
 
 router.post('/', validateUser, async (req, res) => {
   const name = req.body;
