@@ -26,7 +26,15 @@ router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
     });
 });
 
-router.get('/', (req, res) => {});
+router.get('/', (req, res) => {
+  User.get()
+    .then(data => {
+      res.status(200).json(data);
+    })
+    .catch(error => {
+      res.status(500).json({ message: 'Unable to retrieve users.' });
+    });
+});
 
 router.get('/:id', (req, res) => {});
 
