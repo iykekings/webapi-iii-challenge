@@ -13,7 +13,18 @@ router.post('/', validateUser, async (req, res) => {
     });
 });
 
-router.post('/:id/posts', (req, res) => {});
+router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
+  const id = req.params.id;
+  const postData = req.body;
+
+  Post.insert({ text: postData.text, user_id: id })
+    .then(data => {
+      res.status(201).json(data);
+    })
+    .catch(error => {
+      res.status(500).json({ message: 'Unable to add post.' });
+    });
+});
 
 router.get('/', (req, res) => {});
 
