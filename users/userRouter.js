@@ -1,6 +1,17 @@
 const router = require('express').Router();
 
-router.post('/', (req, res) => {});
+router.post('/', validateUser, async (req, res) => {
+  const name = req.body;
+  User.insert(name)
+    .then(data => {
+      User.getById(data.id).then(data => {
+        res.status(201).json(data);
+      });
+    })
+    .catch(error => {
+      res.status(500).json({ message: 'Unable to add user to the database' });
+    });
+});
 
 router.post('/:id/posts', (req, res) => {});
 
