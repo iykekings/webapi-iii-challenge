@@ -78,7 +78,20 @@ router.delete('/:id', validateUserId, async (req, res) => {
     });
 });
 
-router.put('/:id', (req, res) => {});
+router.put('/:id', validateUserId, validateUser, async (req, res) => {
+  const id = req.params.id;
+  const name = req.body;
+
+  User.update(id, name)
+    .then(data => {
+      User.getById(id).then(data => {
+        res.status(201).json(data);
+      });
+    })
+    .catch(error => {
+      res.status(500).json({ message: 'Unable to update user.' });
+    });
+});
 
 //custom middleware
 
