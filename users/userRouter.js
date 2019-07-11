@@ -29,7 +29,15 @@ async function validateUserId(req, res, next) {
   }
 }
 
-function validateUser(req, res, next) {}
+function validateUser(req, res, next) {
+  if (!Object.keys(req.body).length) {
+    res.status(400).json({ message: 'Missing user data' });
+  } else if (req.body.name) {
+    next();
+  } else {
+    res.status(400).json({ message: 'Missing required name field' });
+  }
+}
 
 function validatePost(req, res, next) {}
 
