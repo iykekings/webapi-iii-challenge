@@ -39,8 +39,6 @@ router.delete('/:id', validatePostId, async (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {});
-
 router.put('/:id', validatePostId, validatePost, async (req, res) => {
   const id = req.params.id;
   const postData = req.body;
@@ -57,6 +55,27 @@ router.put('/:id', validatePostId, validatePost, async (req, res) => {
 
 // custom middleware
 
-function validatePostId(req, res, next) {}
+async function validatePostId(req, res, next) {
+  const id = req.params.id;
+
+  const post = await Post.getById(id);
+
+  if (post) {
+    req.post = post;
+    next();
+  } else {
+    res.status(400).json({ message: 'Invalid post ID' });
+  }
+}
+
+function validatePost(req, res, next) {
+  if (!Object.keys(req.body).length) {
+    res.status(400).json({ message: 'Missing post data' });
+  } else if (req.body.text) {
+    next();
+  } else {
+    res.status(400).json({ message: 'Missing required text field' });
+  }
+}
 
 module.exports = router;
