@@ -1,11 +1,11 @@
-const express = 'express';
+const express = require('express');
 
 const server = express();
 server.use(express.json());
 server.use(logger);
 
 server.get('/', (req, res) => {
-  res.send(`<h2>Let's write some middleware!</h2>`)
+  res.send(`<h2>Let's write some middleware!</h2>`);
 });
 
 //custom middleware
@@ -18,7 +18,7 @@ function logger(req, res, next) {
   };
   console.log(loggedData);
   next();
-};
+}
 
 module.exports = server;
 
@@ -27,5 +27,3 @@ module.exports = server;
 
 // server.use('/api/users', userRouter);
 // server.use('/api/posts', postRouter);
-
-
